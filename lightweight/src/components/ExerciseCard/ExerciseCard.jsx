@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 
-function ExerciseCard({ name }) {
-    const [sets, setSets] = useState([]);
+function ExerciseCard({ exercise, onUpdateSets }) {
+    const sets = exercise.sets;
 
     const addSet = () => {
         const newSet = {
@@ -12,24 +12,20 @@ function ExerciseCard({ name }) {
             restTimer: 60,
             timerRunning: false
         };
-        setSets([...sets, newSet]);
-    }
+        onUpdateSets([...sets, newSet]);
+    };
 
     const updateSet = (id, key, value) => {
-        const updatedSets = sets.map(set => {
-            if (set.id === id) {
-                const val = value === '' ? '' : Number(value);
-                return { ...set, [key]: val };
-            }
-            return set;
-        });
-        setSets(updatedSets);
-    }
+        const updatedSets = sets.map(s => 
+            s.id === id ? { ...s, [key]: value === '' ? '' : Number(value) } : s
+        );
+        onUpdateSets(updatedSets);
+    };
 
     const deleteSet = (id) => {
         const filteredSets = sets.filter(set => set.id !== id);
-        setSets(filteredSets);
-    }
+        onUpdateSets(filteredSets);
+    };
 
     const toggleSetDone = (id) => {
         const updatedSets = sets.map(set => {
@@ -38,32 +34,34 @@ function ExerciseCard({ name }) {
             }
             return set;
         });
-        setSets(updatedSets);
-    }
+        onUpdateSets(updatedSets);
+    };
 
     const formatTime = (seconds) => {
         const mins = Math.floor(seconds / 60);
         const secs = seconds % 60;
         return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
-    }
+    };
 
     // timer logic
     useEffect(() => {
+        const hasRunningTimer = sets.some(s => s.timerRunning);
+        if (!hasRunningTimer) return;
+
         const interval = setInterval(() => {
-            setSets((currentSets) =>
-                currentSets.map((s) => {
-                    if (s.timerRunning && s.restTimer > 0) {
-                        return { ...s, restTimer: s.restTimer - 1 };
-                    } else if (s.restTimer === 0 && s.timerRunning) {
-                        return { ...s, timerRunning: false };
-                    }
-                    return s;
-                })
-            );
+            const updatedSets = sets.map((s) => {
+                if (s.timerRunning && s.restTimer > 0) {    
+                    return { ...s, restTimer: s.restTimer - 1 };
+                } else if (s.restTimer === 0 && s.timerRunning) {
+                    return { ...s, timerRunning: false };
+                }
+                return s;
+            });
+            onUpdateSets(updatedSets);
         }, 1000);
 
         return () => clearInterval(interval);
-    }, []);
+    }, [sets, onUpdateSets]);
 
     return (
         <div style={{
@@ -74,7 +72,7 @@ function ExerciseCard({ name }) {
             backgroundColor: '#f9f9f9',
             color: '#333'
         }}>
-            <h3>{name}</h3>
+            <h3>{exercise.name}</h3>
             <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
                 {sets.map((set, index) => (
                     <li key={set.id} style={{ 

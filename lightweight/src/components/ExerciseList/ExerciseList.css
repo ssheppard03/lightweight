@@ -1,0 +1,18 @@
+ul {
+    list-style: none;   
+    padding: 0;
+}
+
+.exercise-item {
+    list-style: none;
+    padding: 12px;
+    cursor: pointer;
+    background-color: #ffffff; 
+    border-bottom: 1px solid #eee;
+    transition: background-color 0.2s ease;
+    color: #007bff;
+}
+
+.exercise-item:hover {
+    background-color: #f0f7ff !important;
+}
