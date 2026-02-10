@@ -8,9 +8,30 @@ function ExerciseList({ onSelect }) {
         { id: 3, name: 'Plank' }
     ]);
 
+    const [addingExercise, setAddingExercise] = useState(false);
+
     const addExercise = (newExercise) => {
         setExerciseList([...exerciseList, newExercise]);
     };
+
+    if (addingExercise) {
+        return (
+            <div style={{ padding: '20px' }}>
+                <h3>Add New Exercise</h3>
+                <input 
+                    type="text" 
+                    placeholder="Exercise Name" 
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter' && e.target.value.trim() !== '') {
+                            addExercise({ id: Date.now(), name: e.target.value.trim() });
+                            setAddingExercise(false);
+                        }
+                    }} 
+                />
+                <button onClick={() => setAddingExercise(false)}>Cancel</button>
+            </div>
+        );
+    }
 
     return (
         <div style={{ backgroundColor: '#f9f9f9', padding: '20px', borderRadius: '8px' }}>
@@ -25,7 +46,7 @@ function ExerciseList({ onSelect }) {
                     </li>
                 ))}
             </ul>
-            <button onClick={() => addExercise({ id: Date.now(), name: 'New Exercise' })}>
+            <button onClick={() => setAddingExercise(true)} style={{ marginTop: '10px' }}>
                 Add Exercise
             </button>
         </div>
